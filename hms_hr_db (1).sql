@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost
--- Generation Time: Mar 06, 2026 at 01:39 PM
+-- Generation Time: Mar 09, 2026 at 10:35 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.30
 
@@ -68,6 +68,16 @@ CREATE TABLE `attendance` (
   `attendance_status` enum('Present','Late','Absent') DEFAULT NULL,
   `remarks` text DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `attendance`
+--
+
+INSERT INTO `attendance` (`attendance_id`, `employee_id`, `attendance_date`, `time_in`, `time_out`, `attendance_status`, `remarks`) VALUES
+(19, 19, '2026-03-07', '2026-03-07 08:02:00', '2026-03-07 17:00:00', 'Present', NULL),
+(20, 20, '2026-03-07', '2026-03-07 08:21:00', '2026-03-07 17:15:00', 'Late', NULL),
+(21, 21, '2026-03-07', NULL, NULL, 'Absent', NULL),
+(22, 22, '2026-03-07', '2026-03-07 07:58:00', '2026-03-07 16:30:00', 'Present', NULL);
 
 -- --------------------------------------------------------
 
@@ -155,6 +165,22 @@ CREATE TABLE `contribution_matrices` (
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `correction_requests`
+--
+
+CREATE TABLE `correction_requests` (
+  `request_id` int(11) NOT NULL,
+  `employee_id` int(11) NOT NULL,
+  `issue_description` text NOT NULL,
+  `request_date` date NOT NULL,
+  `status` enum('Pending','Approved','Rejected') DEFAULT 'Pending',
+  `resolved_date` date DEFAULT NULL,
+  `remarks` text DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `departments`
 --
 
@@ -164,6 +190,20 @@ CREATE TABLE `departments` (
   `domain_type` varchar(50) DEFAULT NULL,
   `description` text DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `departments`
+--
+
+INSERT INTO `departments` (`department_id`, `department_name`, `domain_type`, `description`) VALUES
+(3, 'Human Resources', 'Administrative', 'Handles employee relations and recruitment'),
+(4, 'Nursing', 'Clinical', 'Patient care and nursing services'),
+(5, 'Finance', 'Administrative', 'Financial management and payroll'),
+(6, 'Administration', 'Administrative', 'Hospital administration and management'),
+(7, 'Human Resources', 'Administrative', 'Handles employee relations and recruitment'),
+(8, 'Nursing', 'Clinical', 'Patient care and nursing services'),
+(9, 'Finance', 'Administrative', 'Financial management and payroll'),
+(10, 'Administration', 'Administrative', 'Hospital administration and management');
 
 -- --------------------------------------------------------
 
@@ -194,6 +234,16 @@ CREATE TABLE `employees` (
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
   `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `employees`
+--
+
+INSERT INTO `employees` (`employee_id`, `department_id`, `position_id`, `supervisor_id`, `employee_no`, `first_name`, `last_name`, `middle_name`, `birth_date`, `gender`, `civil_status`, `contact_no`, `email`, `address`, `hire_date`, `employment_status`, `employment_type`, `clinical_rank`, `profile_status`, `created_at`, `updated_at`) VALUES
+(19, 7, 9, NULL, 'EMP001', 'Anna', 'Santos', NULL, '1990-05-15', 'Female', NULL, NULL, 'anna.santos@hospital.com', NULL, '2025-01-15', 'Regular', NULL, NULL, 'Active', '2026-03-07 07:48:27', '2026-03-07 07:48:27'),
+(20, 8, 12, NULL, 'EMP002', 'Jude', 'Molina', NULL, '1988-03-22', 'Male', NULL, NULL, 'jude.molina@hospital.com', NULL, '2025-02-01', 'Regular', NULL, NULL, 'Active', '2026-03-07 07:48:27', '2026-03-07 07:48:27'),
+(21, 8, 12, NULL, 'EMP003', 'Leah', 'Gomez', NULL, '1992-07-10', 'Female', NULL, NULL, 'leah.gomez@hospital.com', NULL, '2025-01-20', 'Regular', NULL, NULL, 'Active', '2026-03-07 07:48:27', '2026-03-07 07:48:27'),
+(22, 9, 14, NULL, 'EMP005', 'Mark', 'Rivera', NULL, '1985-09-18', 'Male', NULL, NULL, 'mark.rivera@hospital.com', NULL, '2025-02-15', 'Probationary', NULL, NULL, 'Active', '2026-03-07 07:48:27', '2026-03-07 07:48:27');
 
 -- --------------------------------------------------------
 
@@ -271,6 +321,47 @@ CREATE TABLE `employee_trainings` (
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `feedback`
+--
+
+CREATE TABLE `feedback` (
+  `id` int(11) NOT NULL,
+  `employee_id` int(11) NOT NULL,
+  `provider_id` int(11) DEFAULT NULL,
+  `feedback_type` enum('Peer','Supervisor','Subordinate','Patient','Self') NOT NULL,
+  `feedback_date` date DEFAULT NULL,
+  `rating` decimal(3,2) DEFAULT NULL,
+  `comments` text DEFAULT NULL,
+  `anonymous` tinyint(1) DEFAULT 0,
+  `status` enum('Pending','In Progress','Completed') DEFAULT 'Pending',
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `goals`
+--
+
+CREATE TABLE `goals` (
+  `id` int(11) NOT NULL,
+  `employee_id` int(11) NOT NULL,
+  `review_period` varchar(20) NOT NULL,
+  `goal_description` text NOT NULL,
+  `goal_type` enum('Performance','Development','Behavioral','Technical') NOT NULL,
+  `target_date` date DEFAULT NULL,
+  `status` enum('Not Started','In Progress','Completed','Cancelled') DEFAULT 'Not Started',
+  `weight` decimal(5,2) DEFAULT 1.00,
+  `achieved_score` decimal(5,2) DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `target_value` decimal(10,2) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `job_postings`
 --
 
@@ -282,6 +373,44 @@ CREATE TABLE `job_postings` (
   `job_description` text DEFAULT NULL,
   `status` enum('Open','Closed') DEFAULT 'Open'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `kpis`
+--
+
+CREATE TABLE `kpis` (
+  `id` int(11) NOT NULL,
+  `name` varchar(200) NOT NULL,
+  `description` text DEFAULT NULL,
+  `category` varchar(100) NOT NULL,
+  `target_value` decimal(10,2) DEFAULT NULL,
+  `current_value` decimal(10,2) DEFAULT NULL,
+  `unit` varchar(50) DEFAULT NULL,
+  `period` varchar(20) NOT NULL,
+  `status` enum('On Track','At Risk','Behind','Achieved','Exceeded') DEFAULT 'On Track',
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `kpis`
+--
+
+INSERT INTO `kpis` (`id`, `name`, `description`, `category`, `target_value`, `current_value`, `unit`, `period`, `status`, `created_at`, `updated_at`) VALUES
+(1, 'Patient Satisfaction', 'Overall patient satisfaction score', 'Quality', 95.00, 92.00, '%', 'Q1 2026', 'On Track', '2026-03-09 08:41:55', '2026-03-09 08:41:55'),
+(2, 'Employee Attendance', 'Monthly average employee attendance rate', 'HR', 98.00, 96.00, '%', 'Q1 2026', 'On Track', '2026-03-09 08:41:55', '2026-03-09 08:41:55'),
+(3, 'Training Completion', 'Completion rate for mandatory training courses', 'Development', 85.00, 78.00, '%', 'Q1 2026', 'At Risk', '2026-03-09 08:41:55', '2026-03-09 08:41:55'),
+(4, 'Incident Reports', 'Number of workplace incident reports', 'Safety', 5.00, 3.00, 'count', 'Q1 2026', 'Achieved', '2026-03-09 08:41:55', '2026-03-09 08:41:55'),
+(5, 'Patient Satisfaction', 'Overall patient satisfaction score', 'Quality', 95.00, 92.00, '%', 'Q1 2026', 'On Track', '2026-03-09 08:47:44', '2026-03-09 08:47:44'),
+(6, 'Employee Attendance', 'Monthly average employee attendance rate', 'HR', 98.00, 96.00, '%', 'Q1 2026', 'On Track', '2026-03-09 08:47:44', '2026-03-09 08:47:44'),
+(7, 'Training Completion', 'Completion rate for mandatory training courses', 'Development', 85.00, 78.00, '%', 'Q1 2026', 'At Risk', '2026-03-09 08:47:44', '2026-03-09 08:47:44'),
+(8, 'Incident Reports', 'Number of workplace incident reports', 'Safety', 5.00, 3.00, 'count', 'Q1 2026', 'Achieved', '2026-03-09 08:47:44', '2026-03-09 08:47:44'),
+(9, 'Patient Satisfaction', 'Overall patient satisfaction score', 'Quality', 95.00, 92.00, '%', 'Q1 2026', 'On Track', '2026-03-09 08:52:35', '2026-03-09 08:52:35'),
+(10, 'Employee Attendance', 'Monthly average employee attendance rate', 'HR', 98.00, 96.00, '%', 'Q1 2026', 'On Track', '2026-03-09 08:52:35', '2026-03-09 08:52:35'),
+(11, 'Training Completion', 'Completion rate for mandatory training courses', 'Development', 85.00, 78.00, '%', 'Q1 2026', 'At Risk', '2026-03-09 08:52:35', '2026-03-09 08:52:35'),
+(12, 'Incident Reports', 'Number of workplace incident reports', 'Safety', 5.00, 3.00, 'count', 'Q1 2026', 'Achieved', '2026-03-09 08:52:35', '2026-03-09 08:52:35');
 
 -- --------------------------------------------------------
 
@@ -312,6 +441,53 @@ CREATE TABLE `leave_balances` (
   `remaining_credits` decimal(5,2) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- Dumping data for table `leave_balances`
+--
+
+INSERT INTO `leave_balances` (`balance_id`, `employee_id`, `leave_type`, `allotted_credits`, `used_credits`, `remaining_credits`) VALUES
+(11, 19, 'Vacation Leave', 15.00, 3.00, 12.00),
+(12, 19, 'Sick Leave', 15.00, 5.00, 7.00),
+(13, 19, 'Emergency Leave', 3.00, 0.00, 3.00),
+(14, 20, 'Vacation Leave', 15.00, 5.00, 10.00),
+(15, 20, 'Sick Leave', 15.00, 1.00, 14.00),
+(16, 20, 'Emergency Leave', 3.00, 1.00, 2.00),
+(17, 21, 'Vacation Leave', 15.00, 7.00, 8.00),
+(18, 21, 'Sick Leave', 15.00, 3.00, 12.00),
+(19, 21, 'Emergency Leave', 3.00, 0.00, 3.00),
+(20, 22, 'Vacation Leave', 15.00, 2.00, 13.00),
+(21, 22, 'Sick Leave', 15.00, 0.00, 15.00),
+(22, 22, 'Emergency Leave', 3.00, 0.00, 3.00);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `leave_policies`
+--
+
+CREATE TABLE `leave_policies` (
+  `policy_id` int(11) NOT NULL,
+  `leave_type` varchar(50) NOT NULL,
+  `days_per_year` int(11) DEFAULT NULL,
+  `max_consecutive` int(11) DEFAULT NULL,
+  `notice_required` varchar(50) DEFAULT NULL,
+  `description` text DEFAULT NULL,
+  `is_active` tinyint(1) DEFAULT 1
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `leave_policies`
+--
+
+INSERT INTO `leave_policies` (`policy_id`, `leave_type`, `days_per_year`, `max_consecutive`, `notice_required`, `description`, `is_active`) VALUES
+(1, 'Vacation Leave', 15, 10, '7 days', 'Annual vacation leave for rest and recreation', 1),
+(2, 'Sick Leave', 15, 5, 'Same day', 'Sick leave with medical certificate required for more than 2 days', 1),
+(3, 'Emergency Leave', 3, 3, 'As soon as possible', 'For urgent and unforeseen matters', 1),
+(4, 'Maternity Leave', 60, 60, '30 days', 'Maternity leave for female employees', 1),
+(5, 'Paternity Leave', 7, 7, '7 days', 'Paternity leave for male employees', 1),
+(6, 'Bereavement Leave', 3, 3, '1 day', 'For death of immediate family member', 1),
+(7, 'Study Leave', 10, 10, '15 days', 'For professional development and training', 1);
+
 -- --------------------------------------------------------
 
 --
@@ -330,6 +506,20 @@ CREATE TABLE `leave_requests` (
   `approved_by` int(11) DEFAULT NULL,
   `approval_date` date DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `leave_requests`
+--
+
+INSERT INTO `leave_requests` (`leave_id`, `employee_id`, `employee_name`, `leave_type`, `start_date`, `end_date`, `leave_reason`, `leave_status`, `approved_by`, `approval_date`) VALUES
+(1, 21, NULL, 'Vacation', '2026-03-07', '2026-03-14', 'vacation', 'Pending', NULL, NULL),
+(2, 20, NULL, 'Emergency', '2026-03-08', '2026-03-09', 'accident', 'Pending', NULL, NULL),
+(3, 19, 'Anna Santos', 'Sick Leave', '2026-03-10', '2026-03-12', 'Flu and fever', 'Approved', 19, '2026-03-08'),
+(4, 20, 'Jude Molina', 'Vacation Leave', '2026-03-15', '2026-03-20', 'Family vacation', 'Approved', 19, '2026-03-01'),
+(5, 22, 'Mark Rivera', 'Emergency Leave', '2026-03-08', '2026-03-08', 'Family emergency', 'Approved', 19, '2026-03-07'),
+(6, 19, 'Anna Santos', 'Vacation Leave', '2026-04-01', '2026-04-05', 'Personal time off', 'Rejected', 20, '2026-03-05'),
+(7, 21, 'Leah Gomez', 'Sick Leave', '2026-02-20', '2026-02-22', 'Medical checkup', 'Approved', 19, '2026-02-19'),
+(8, 19, 'Anna Santos', 'Maternity Leave', '2026-03-08', '2026-04-08', 'Maternity', 'Pending', NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -398,6 +588,33 @@ CREATE TABLE `pay_periods` (
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `performance_improvement_plans`
+--
+
+CREATE TABLE `performance_improvement_plans` (
+  `id` int(11) NOT NULL,
+  `employee_id` int(11) NOT NULL,
+  `supervisor_id` int(11) NOT NULL,
+  `start_date` date NOT NULL,
+  `end_date` date NOT NULL,
+  `issue_description` text NOT NULL,
+  `action_plan` text DEFAULT NULL,
+  `target_goals` text DEFAULT NULL,
+  `resources_required` text DEFAULT NULL,
+  `review_frequency` enum('Daily','Weekly','Bi-weekly','Monthly') DEFAULT 'Weekly',
+  `progress_score` decimal(5,2) DEFAULT NULL,
+  `status` enum('Active','Completed','Extended','Terminated','Cancelled') DEFAULT 'Active',
+  `extension_count` int(11) DEFAULT 0,
+  `supervisor_notes` text DEFAULT NULL,
+  `created_date` date DEFAULT NULL,
+  `completed_date` date DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `performance_reviews`
 --
 
@@ -409,8 +626,22 @@ CREATE TABLE `performance_reviews` (
   `review_period_end` date DEFAULT NULL,
   `review_date` date DEFAULT NULL,
   `rating` decimal(3,2) DEFAULT NULL,
-  `remarks` text DEFAULT NULL
+  `remarks` text DEFAULT NULL,
+  `review_period` varchar(20) DEFAULT NULL,
+  `goals_met` int(11) DEFAULT NULL,
+  `total_goals` int(11) DEFAULT NULL,
+  `status` enum('Pending','Self-Assessment','Manager Review','Calibration','Completed','Probationary') DEFAULT 'Pending'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `performance_reviews`
+--
+
+INSERT INTO `performance_reviews` (`review_id`, `employee_id`, `reviewer_id`, `review_period_start`, `review_period_end`, `review_date`, `rating`, `remarks`, `review_period`, `goals_met`, `total_goals`, `status`) VALUES
+(13, 19, 19, '2026-01-01', '2026-03-31', '2026-03-01', 4.80, 'Excellent performance', 'Q1 2026', 9, 10, 'Completed'),
+(14, 20, 19, '2026-01-01', '2026-03-31', '2026-03-02', 4.50, 'Very good performance', 'Q1 2026', 8, 10, 'Completed'),
+(15, 21, 19, '2026-01-01', '2026-03-31', '2026-03-10', 3.80, 'Good performance with room for improvement', 'Q1 2026', 6, 10, 'Manager Review'),
+(16, 22, 19, '2026-01-01', '2026-03-31', '2026-03-08', 4.20, 'Solid performance', 'Q1 2026', 7, 10, 'Self-Assessment');
 
 -- --------------------------------------------------------
 
@@ -426,6 +657,19 @@ CREATE TABLE `positions` (
   `is_clinical` tinyint(1) DEFAULT 0,
   `position_status` enum('Active','Frozen','Abolished') DEFAULT 'Active'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `positions`
+--
+
+INSERT INTO `positions` (`position_id`, `department_id`, `grade_id`, `position_title`, `is_clinical`, `position_status`) VALUES
+(9, 7, 1, 'HR Manager', 0, 'Active'),
+(10, 7, 1, 'HR Assistant', 0, 'Active'),
+(11, 8, 2, 'Chief Nurse', 1, 'Active'),
+(12, 8, 2, 'Staff Nurse', 1, 'Active'),
+(13, 9, 3, 'Finance Manager', 0, 'Active'),
+(14, 9, 3, 'Accountant', 0, 'Active'),
+(15, 10, 3, 'Administrative Officer', 0, 'Active');
 
 -- --------------------------------------------------------
 
@@ -443,6 +687,50 @@ CREATE TABLE `professional_licenses` (
   `license_status` enum('Active','Expired') DEFAULT NULL,
   `scanned_copy_url` varchar(255) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `review_cycles`
+--
+
+CREATE TABLE `review_cycles` (
+  `id` int(11) NOT NULL,
+  `period` varchar(20) NOT NULL,
+  `stage` enum('Goal Setting','Self-Assessment','Manager Review','Calibration','Finalized') NOT NULL,
+  `employee_id` int(11) NOT NULL,
+  `start_date` date NOT NULL,
+  `end_date` date NOT NULL,
+  `status` enum('Active','Completed','Cancelled') DEFAULT 'Active',
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `review_cycles`
+--
+
+INSERT INTO `review_cycles` (`id`, `period`, `stage`, `employee_id`, `start_date`, `end_date`, `status`, `created_at`, `updated_at`) VALUES
+(61, 'Q1 2026', 'Goal Setting', 19, '2026-01-01', '2026-03-31', 'Completed', '2026-03-09 08:52:35', '2026-03-09 08:52:35'),
+(62, 'Q1 2026', 'Goal Setting', 20, '2026-01-01', '2026-03-31', 'Completed', '2026-03-09 08:52:35', '2026-03-09 08:52:35'),
+(63, 'Q1 2026', 'Goal Setting', 21, '2026-01-01', '2026-03-31', 'Completed', '2026-03-09 08:52:35', '2026-03-09 08:52:35'),
+(64, 'Q1 2026', 'Goal Setting', 22, '2026-01-01', '2026-03-31', 'Completed', '2026-03-09 08:52:35', '2026-03-09 08:52:35'),
+(65, 'Q1 2026', 'Self-Assessment', 19, '2026-02-01', '2026-03-15', 'Completed', '2026-03-09 08:52:35', '2026-03-09 08:52:35'),
+(66, 'Q1 2026', 'Self-Assessment', 20, '2026-02-01', '2026-03-15', 'Completed', '2026-03-09 08:52:35', '2026-03-09 08:52:35'),
+(67, 'Q1 2026', 'Self-Assessment', 21, '2026-02-01', '2026-03-15', 'Completed', '2026-03-09 08:52:35', '2026-03-09 08:52:35'),
+(68, 'Q1 2026', 'Self-Assessment', 22, '2026-02-01', '2026-03-15', 'Completed', '2026-03-09 08:52:35', '2026-03-09 08:52:35'),
+(69, 'Q1 2026', 'Manager Review', 19, '2026-02-15', '2026-03-22', 'Completed', '2026-03-09 08:52:35', '2026-03-09 08:52:35'),
+(70, 'Q1 2026', 'Manager Review', 20, '2026-02-15', '2026-03-22', 'Completed', '2026-03-09 08:52:35', '2026-03-09 08:52:35'),
+(71, 'Q1 2026', 'Manager Review', 21, '2026-02-15', '2026-03-22', '', '2026-03-09 08:52:35', '2026-03-09 08:52:35'),
+(72, 'Q1 2026', 'Manager Review', 22, '2026-02-15', '2026-03-22', '', '2026-03-09 08:52:35', '2026-03-09 08:52:35'),
+(73, 'Q1 2026', 'Calibration', 19, '2026-03-01', '2026-03-31', 'Completed', '2026-03-09 08:52:35', '2026-03-09 08:52:35'),
+(74, 'Q1 2026', 'Calibration', 20, '2026-03-01', '2026-03-31', 'Completed', '2026-03-09 08:52:35', '2026-03-09 08:52:35'),
+(75, 'Q1 2026', 'Calibration', 21, '2026-03-01', '2026-03-31', '', '2026-03-09 08:52:35', '2026-03-09 08:52:35'),
+(76, 'Q1 2026', 'Calibration', 22, '2026-03-01', '2026-03-31', '', '2026-03-09 08:52:35', '2026-03-09 08:52:35'),
+(77, 'Q1 2026', 'Finalized', 19, '2026-03-15', '2026-03-31', 'Completed', '2026-03-09 08:52:35', '2026-03-09 08:52:35'),
+(78, 'Q1 2026', 'Finalized', 20, '2026-03-15', '2026-03-31', 'Completed', '2026-03-09 08:52:35', '2026-03-09 08:52:35'),
+(79, 'Q1 2026', 'Finalized', 21, '2026-03-15', '2026-03-31', '', '2026-03-09 08:52:35', '2026-03-09 08:52:35'),
+(80, 'Q1 2026', 'Finalized', 22, '2026-03-15', '2026-03-31', '', '2026-03-09 08:52:35', '2026-03-09 08:52:35');
 
 -- --------------------------------------------------------
 
@@ -474,6 +762,15 @@ CREATE TABLE `salary_matrices` (
   `basic_salary_amount` decimal(10,2) NOT NULL,
   `effective_date` date NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `salary_matrices`
+--
+
+INSERT INTO `salary_matrices` (`grade_id`, `salary_grade`, `step_increment`, `basic_salary_amount`, `effective_date`) VALUES
+(1, 'Grade 1', 1, 25000.00, '2025-01-01'),
+(2, 'Grade 2', 1, 30000.00, '2025-01-01'),
+(3, 'Grade 3', 1, 35000.00, '2025-01-01');
 
 -- --------------------------------------------------------
 
@@ -607,6 +904,13 @@ ALTER TABLE `contribution_matrices`
   ADD PRIMARY KEY (`matrix_id`);
 
 --
+-- Indexes for table `correction_requests`
+--
+ALTER TABLE `correction_requests`
+  ADD PRIMARY KEY (`request_id`),
+  ADD KEY `employee_id` (`employee_id`);
+
+--
 -- Indexes for table `departments`
 --
 ALTER TABLE `departments`
@@ -663,11 +967,33 @@ ALTER TABLE `employee_trainings`
   ADD KEY `training_id` (`training_id`);
 
 --
+-- Indexes for table `feedback`
+--
+ALTER TABLE `feedback`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `idx_feedback_employee` (`employee_id`),
+  ADD KEY `idx_feedback_provider` (`provider_id`),
+  ADD KEY `idx_feedback_type` (`feedback_type`);
+
+--
+-- Indexes for table `goals`
+--
+ALTER TABLE `goals`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `employee_id` (`employee_id`);
+
+--
 -- Indexes for table `job_postings`
 --
 ALTER TABLE `job_postings`
   ADD PRIMARY KEY (`job_id`),
   ADD KEY `position_id` (`position_id`);
+
+--
+-- Indexes for table `kpis`
+--
+ALTER TABLE `kpis`
+  ADD PRIMARY KEY (`id`);
 
 --
 -- Indexes for table `learning_logs`
@@ -682,6 +1008,12 @@ ALTER TABLE `learning_logs`
 ALTER TABLE `leave_balances`
   ADD PRIMARY KEY (`balance_id`),
   ADD KEY `employee_id` (`employee_id`);
+
+--
+-- Indexes for table `leave_policies`
+--
+ALTER TABLE `leave_policies`
+  ADD PRIMARY KEY (`policy_id`);
 
 --
 -- Indexes for table `leave_requests`
@@ -720,6 +1052,15 @@ ALTER TABLE `pay_periods`
   ADD PRIMARY KEY (`period_id`);
 
 --
+-- Indexes for table `performance_improvement_plans`
+--
+ALTER TABLE `performance_improvement_plans`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `idx_pip_employee` (`employee_id`),
+  ADD KEY `idx_pip_supervisor` (`supervisor_id`),
+  ADD KEY `idx_pip_status` (`status`);
+
+--
 -- Indexes for table `performance_reviews`
 --
 ALTER TABLE `performance_reviews`
@@ -740,6 +1081,13 @@ ALTER TABLE `positions`
 --
 ALTER TABLE `professional_licenses`
   ADD PRIMARY KEY (`license_id`),
+  ADD KEY `employee_id` (`employee_id`);
+
+--
+-- Indexes for table `review_cycles`
+--
+ALTER TABLE `review_cycles`
+  ADD PRIMARY KEY (`id`),
   ADD KEY `employee_id` (`employee_id`);
 
 --
@@ -811,7 +1159,7 @@ ALTER TABLE `applications`
 -- AUTO_INCREMENT for table `attendance`
 --
 ALTER TABLE `attendance`
-  MODIFY `attendance_id` bigint(20) NOT NULL AUTO_INCREMENT;
+  MODIFY `attendance_id` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=23;
 
 --
 -- AUTO_INCREMENT for table `audit_logs`
@@ -844,16 +1192,22 @@ ALTER TABLE `contribution_matrices`
   MODIFY `matrix_id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
+-- AUTO_INCREMENT for table `correction_requests`
+--
+ALTER TABLE `correction_requests`
+  MODIFY `request_id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
 -- AUTO_INCREMENT for table `departments`
 --
 ALTER TABLE `departments`
-  MODIFY `department_id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `department_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
 
 --
 -- AUTO_INCREMENT for table `employees`
 --
 ALTER TABLE `employees`
-  MODIFY `employee_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+  MODIFY `employee_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=23;
 
 --
 -- AUTO_INCREMENT for table `employee_benefits`
@@ -886,10 +1240,28 @@ ALTER TABLE `employee_trainings`
   MODIFY `emp_training_id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
+-- AUTO_INCREMENT for table `feedback`
+--
+ALTER TABLE `feedback`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `goals`
+--
+ALTER TABLE `goals`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+
+--
 -- AUTO_INCREMENT for table `job_postings`
 --
 ALTER TABLE `job_postings`
   MODIFY `job_id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `kpis`
+--
+ALTER TABLE `kpis`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
 
 --
 -- AUTO_INCREMENT for table `learning_logs`
@@ -901,13 +1273,19 @@ ALTER TABLE `learning_logs`
 -- AUTO_INCREMENT for table `leave_balances`
 --
 ALTER TABLE `leave_balances`
-  MODIFY `balance_id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `balance_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=23;
+
+--
+-- AUTO_INCREMENT for table `leave_policies`
+--
+ALTER TABLE `leave_policies`
+  MODIFY `policy_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
 
 --
 -- AUTO_INCREMENT for table `leave_requests`
 --
 ALTER TABLE `leave_requests`
-  MODIFY `leave_id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `leave_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
 
 --
 -- AUTO_INCREMENT for table `onboardings`
@@ -934,22 +1312,34 @@ ALTER TABLE `pay_periods`
   MODIFY `period_id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
+-- AUTO_INCREMENT for table `performance_improvement_plans`
+--
+ALTER TABLE `performance_improvement_plans`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
 -- AUTO_INCREMENT for table `performance_reviews`
 --
 ALTER TABLE `performance_reviews`
-  MODIFY `review_id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `review_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=17;
 
 --
 -- AUTO_INCREMENT for table `positions`
 --
 ALTER TABLE `positions`
-  MODIFY `position_id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `position_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
 
 --
 -- AUTO_INCREMENT for table `professional_licenses`
 --
 ALTER TABLE `professional_licenses`
   MODIFY `license_id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `review_cycles`
+--
+ALTER TABLE `review_cycles`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=81;
 
 --
 -- AUTO_INCREMENT for table `roster_schedules`
@@ -961,7 +1351,7 @@ ALTER TABLE `roster_schedules`
 -- AUTO_INCREMENT for table `salary_matrices`
 --
 ALTER TABLE `salary_matrices`
-  MODIFY `grade_id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `grade_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT for table `shifts`
@@ -1018,6 +1408,12 @@ ALTER TABLE `claim_reimbursements`
   ADD CONSTRAINT `claim_reimbursements_ibfk_2` FOREIGN KEY (`approved_by`) REFERENCES `employees` (`employee_id`);
 
 --
+-- Constraints for table `correction_requests`
+--
+ALTER TABLE `correction_requests`
+  ADD CONSTRAINT `correction_requests_ibfk_1` FOREIGN KEY (`employee_id`) REFERENCES `employees` (`employee_id`) ON DELETE CASCADE;
+
+--
 -- Constraints for table `employees`
 --
 ALTER TABLE `employees`
@@ -1058,6 +1454,19 @@ ALTER TABLE `employee_specialties`
 ALTER TABLE `employee_trainings`
   ADD CONSTRAINT `employee_trainings_ibfk_1` FOREIGN KEY (`employee_id`) REFERENCES `employees` (`employee_id`),
   ADD CONSTRAINT `employee_trainings_ibfk_2` FOREIGN KEY (`training_id`) REFERENCES `trainings` (`training_id`);
+
+--
+-- Constraints for table `feedback`
+--
+ALTER TABLE `feedback`
+  ADD CONSTRAINT `fk_feedback_employee` FOREIGN KEY (`employee_id`) REFERENCES `employees` (`employee_id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `fk_feedback_provider` FOREIGN KEY (`provider_id`) REFERENCES `employees` (`employee_id`) ON DELETE SET NULL;
+
+--
+-- Constraints for table `goals`
+--
+ALTER TABLE `goals`
+  ADD CONSTRAINT `goals_ibfk_1` FOREIGN KEY (`employee_id`) REFERENCES `employees` (`employee_id`) ON DELETE CASCADE;
 
 --
 -- Constraints for table `job_postings`
@@ -1104,6 +1513,13 @@ ALTER TABLE `payroll_deductions`
   ADD CONSTRAINT `payroll_deductions_ibfk_1` FOREIGN KEY (`payroll_id`) REFERENCES `payrolls` (`payroll_id`);
 
 --
+-- Constraints for table `performance_improvement_plans`
+--
+ALTER TABLE `performance_improvement_plans`
+  ADD CONSTRAINT `fk_pip_employee` FOREIGN KEY (`employee_id`) REFERENCES `employees` (`employee_id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `fk_pip_supervisor` FOREIGN KEY (`supervisor_id`) REFERENCES `employees` (`employee_id`) ON DELETE CASCADE;
+
+--
 -- Constraints for table `performance_reviews`
 --
 ALTER TABLE `performance_reviews`
@@ -1122,6 +1538,12 @@ ALTER TABLE `positions`
 --
 ALTER TABLE `professional_licenses`
   ADD CONSTRAINT `professional_licenses_ibfk_1` FOREIGN KEY (`employee_id`) REFERENCES `employees` (`employee_id`);
+
+--
+-- Constraints for table `review_cycles`
+--
+ALTER TABLE `review_cycles`
+  ADD CONSTRAINT `review_cycles_ibfk_1` FOREIGN KEY (`employee_id`) REFERENCES `employees` (`employee_id`) ON DELETE CASCADE;
 
 --
 -- Constraints for table `roster_schedules`
